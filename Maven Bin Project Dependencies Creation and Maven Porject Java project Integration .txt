@@ -1,0 +1,22 @@
+MAVEN JAR AND WAR FILES CREATION: 
+
+01. Download and Extract Apache Maven 
+02. Take Maven Folder and Store it in your Desired Location (User -> Emp_id -> Maven)
+03. Maven -> go to Bin -> Inside bin folder, Copy the path 
+04. Open "Edit the Environment Variables" -> Advanced -> Environment Variables -> User Variables 
+-> Edit the Path -> Paste the Path and Save. 
+05. Creating a New Maven Project: 
+-> File -> New -> Maven Project -> Skip Archetype selection -> Write Group ID, Artefact ID, Name -> Create
+06. Go to Pom.xml and Paste this within <dependencies>
+<dependency>
+<groupId>mysql</groupId>
+<artifactId>mysql-connector-java</artifactId>
+<version>8.0.33</version>
+<scope>compile</scope>
+</dependency>
+08. Save the file 
+09. Go to Users -> Emp_id -> .m2 -> Repositories -> Group ID folder name -> Go to SQL -> Copy the j file 
+10. Paste in your desired folders: User -> Emp_id -> Javafilesjar
+11. Go to your JDBC Project: 
+Project Name -> Right Click -> Build Path -> Library -> Class Path -> Add External JAR -> Choose the JAR file -> Apply and save 
+12. Edit the code with respect to your sql workbench and save and run! 

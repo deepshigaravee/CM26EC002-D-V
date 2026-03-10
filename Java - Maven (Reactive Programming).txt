@@ -1,0 +1,65 @@
+Example using maven project
+import reactor.core.publisher.Flux;
+import java.util.Arrays;
+import java.util.List;
+ 
+public class ReactiveExample {
+ 
+   public static void main(String[] args) {
+      List<String> words = Arrays.asList("apple", "banana", "cherry", "date", "elderberry");
+ 
+       // 1. Create a Flux (Publisher) from a list of items
+      Flux<String> reactiveStream = Flux.fromIterable(words)
+           // 2. Apply a filter operation (only words longer than 5 characters)
+          .filter(word -> word.length() > 5)
+           // 3. Apply a map operation (convert to uppercase)
+          .map(String::toUpperCase)
+           // 4. Log the data flow for demonstration/debugging
+           .log();
+ 
+       // 5. Subscribe to the stream to start the process and define what to do with each item
+      reactiveStream.subscribe(
+           item -> System.out.println("Subscriber received: " + item), // onNext consumer
+           error -> System.err.println("Subscriber error: " + error),   // onError consumer
+           () -> System.out.println("Subscriber completed")            // onComplete runnable
+       );
+   }
+}
+ 
+ 
+Output
+[ INFO] (main) | onSubscribe([Fuseable] FluxMapFuseable.MapFuseableSubscriber)
+[ INFO] (main) | request(unbounded)
+[ INFO] (main) | onNext(BANANA)
+Subscriber received: BANANA
+[ INFO] (main) | onNext(CHERRY)
+Subscriber received: CHERRY
+[ INFO] (main) | onNext(ELDERBERRY)
+Subscriber received: ELDERBERRY
+[ INFO] (main) | onComplete()
+Subscriber completed
+ 
+ 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+<groupId>com.ex</groupId>
+<artifactId>mvre</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+<name>mvre</name>
+ 
+<dependencies>
+      <dependency>
+          <groupId>io.projectreactor</groupId>
+          <artifactId>reactor-core</artifactId>
+          <version>3.6.0</version>
+      </dependency>
+      
+      <dependency>
+          <groupId>io.projectreactor</groupId>
+          <artifactId>reactor-test</artifactId>
+          <version>3.6.0</version>
+          <scope>test</scope>
+      </dependency>
+  </dependencies>
+</project>
+ 
