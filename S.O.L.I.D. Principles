@@ -1,0 +1,296 @@
+S.O.L.I.D PRINCIPLES:
+- Implemented to keep my code clean, flexible, and easy to maintain as the project grows.
+- SOLID refers to :
+S - Single Responsibility Principle
+O - Open/Close Principle
+L - Liskov Substituton Principle
+I - Interface Segregration Principle
+D - Dependency Inversion Principle
+
+Why SOLID Principles?
+- Reduces the dependencies 
+- makes design easier, understandable. 
+- the system can be maintainable, testable, scalable, & reusable. 
+
+Advantages: 
+1. Highly Focussed Classes 
+2. Plug and Play - Adding new features by writing new codes.
+3. Unit Testing becomes easy - since classes are small and rely on interfaces.
+4. No Surprise Bugs 
+5. Fewer Merge Conflicts.
+
+_____________________________________________________________________________
+Principle     |     Focus     |          Result                               |
+______________|_______________|_______________________________________________|
+SRP           |    Classes    | Small, focused classes.                       |
+OCP           |    Features   | Add new stuff without breaking old stuff.     |
+LSP           |   Inheritance | Subclasses don't surprise the parent class.   |
+ISP           |   Interfaces  | No "fat" interfaces with unused methods.      |
+DIP           | Relationships | "Pluggable" architecture; easy to swap parts. |
+______________|_______________|_______________________________________________|
+
+1. S - Single Responsibility Principle
+> A class should do one thing and do it well. 
+> If a class has multiple responsibilities, they become "coupled" (glued together). 
+> Changing one part accidentally breaks the others.
+
+BAD PRACTICE: 
+public class User {
+    private String email;
+    private String password;
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    // Responsibility 1: Validation Logic
+    public boolean isValidEmail() {
+        return email.contains("@");
+    }
+
+    // Responsibility 2: Database Persistence
+    public void saveToDatabase() {
+        System.out.println("Connecting to MySQL...");
+        System.out.println("Inserting user into 'users' table...");
+    }
+}
+
+GOOD PRACTICE: 
+1. The Model (Data):
+public class User {
+    private String email;
+    private String password;
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+    // Getters and Setters only...
+}
+
+2. The service (Validator):
+public class UserValidator {
+    public boolean validate(User user) {
+        return user.getEmail().contains("@");
+    }
+}
+
+3. Repository (Database Guy):
+public class UserRepository {
+    public void save(User user) {
+        System.out.println("Saving to database via JDBC/Hibernate...");
+    }
+}
+
+2. O - Open/Close Principle
+> Stop the "Switch-Case" or "If-Else" nightmare. 
+> Instead of changing the "Engine" of your app to add a new "Part," 
+> Design the engine to accept "Plug-ins."
+______________________________________________________________________________________________________________________________________________
+> You should be able to add new features to your app without touching the code you’ve already written and tested. 
+> If you have to open up an existing, working class to add an if statement every time a new requirement comes in, you’re breaking OCP.
+
+BAD PRACTICE:
+public class InsurancePremiumCalculator {
+    public double calculatePremium(Object client) {
+        if (client instanceof HealthClient) {
+            return 100.0; 
+        } else if (client instanceof HomeClient) {
+            return 250.0;
+        }
+        // Problem: If we add 'CarInsurance', we MUST modify this class.
+        // This risks breaking the existing Health/Home logic!
+        return 0;
+    }
+}
+
+GOOD PRACTICE:
+1. Interface (The Plug):
+public interface InsurancePolicy {
+    double calculate();
+}
+
+2. Implementation (Plug-ins):
+public class HealthPolicy implements InsurancePolicy {
+    public double calculate() { return 100.0; }
+}
+
+public class HomePolicy implements InsurancePolicy {
+    public double calculate() { return 250.0; }
+}
+
+// NEW FEATURE: Just add a new class! No need to touch existing code.
+public class CarPolicy implements InsurancePolicy {
+    public double calculate() { return 150.0; }
+}
+
+3. Calculator (Closed for Modification):
+public class InsurancePremiumCalculator {
+    public double calculatePremium(InsurancePolicy policy) {
+        // This code NEVER changes again, no matter how many 
+        // new insurance types we add in the future.
+        return policy.calculate();
+    }
+}
+
+3. L - Liskov Substituton Principle
+> A subclass should be able to replace its parent class without breaking the program.
+> Inheritance should represent a true "is-a" relationship in terms of behavior, not just attributes. 
+> If a subclass overrides a method from the parent only to throw an "UnsupportedOperationException," that's a red flag!
+
+BAD PRACTICE: 
+The LSP Violation: 
+public class Rectangle {
+    protected int width, height;
+
+    public void setWidth(int width) { this.width = width; }
+    public void setHeight(int height) { this.height = height; }
+    public int getArea() { return width * height; }
+}
+
+public class Square extends Rectangle {
+    @Override
+    public void setWidth(int width) {
+        this.width = width;
+        this.height = width; // Forced to keep sides equal
+    }
+
+    @Override
+    public void setHeight(int height) {
+        this.height = height;
+        this.width = height; // Forced to keep sides equal
+    }
+}
+
+GOOD PRACTICE:
+The Behavioural Fix:
+public interface Shape {
+    int getArea();
+}
+
+public class Rectangle implements Shape {
+    private int width, height;
+    public Rectangle(int w, int h) { this.width = w; this.height = h; }
+    public int getArea() { return width * height; }
+}
+
+public class Square implements Shape {
+    private int side;
+    public Square(int side) { this.side = side; }
+    public int getArea() { return side * side; }
+}
+
+4. I - Interface Segregration Principle:
+> This principle is all about keeping your Java Interfaces lean and mean.
+> Clients should not be forced to depend on methods they do not use.
+> Don't create a "Master Interface" that has 20 methods if some of your classes only need two of them. 
+> If you force a class to implement a method it doesn't need (usually leaving it empty or throwing an error), you’ve created a "Fat Interface."
+> It’s better to have many specific interfaces than one general-purpose interface. 
+> This keeps your classes lightweight and prevents them from having an "identity crisis."
+BAD PRACTICE:
+1. The Fat Interface:
+public interface SmartDevice {
+    void print();
+    void scan();
+    void fax();
+}
+
+// Problem: An old-school printer doesn't know how to fax or scan!
+public class OldPrinter implements SmartDevice {
+    public void print() {
+        System.out.println("Printing document...");
+    }
+
+    public void scan() {
+        // I don't know how to scan! 
+        throw new UnsupportedOperationException(); 
+    }
+
+    public void fax() {
+        // I don't know how to fax!
+        throw new UnsupportedOperationException();
+    }
+}
+
+GOOD PRACTICE:
+1. The Segregrated way:
+public interface Printer {
+    void print();
+}
+
+public interface Scanner {
+    void scan();
+}
+
+public interface Fax {
+    void fax();
+}
+
+// Now, the Old Printer only does what it's supposed to:
+public class OldPrinter implements Printer {
+    public void print() {
+        System.out.println("Printing...");
+    }
+}
+
+// And the high-end office machine can do everything by implementing multiple interfaces:
+public class SuperMachine implements Printer, Scanner, Fax {
+    public void print() { /* ... */ }
+    public void scan() { /* ... */ }
+    public void fax() { /* ... */ }
+}
+
+5. D - Dependency Inversion Principle:
+> High-level modules should not depend on low-level modules. 
+> Both should depend on abstractions.
+> Abstractions should not depend on details. Details should depend on abstractions.
+> Depend on interfaces, not concrete classes.
+
+BAD PRACTICE:
+1. The Hard Wired Way: 
+public class EmailProvider {
+    public void sendEmail(String message) {
+        System.out.println("Sending Email: " + message);
+    }
+}
+
+public class NotificationService {
+    // Problem: High-level class depends on a CONCRETE low-level class.
+    private EmailProvider emailProvider = new EmailProvider();
+
+    public void notify(String message) {
+        emailProvider.sendEmail(message);
+    }
+}
+
+GOOD PRACTICE:
+1. The Inverted Way: 
+a. The Abstraction:
+public interface MessageSender {
+    void send(String message);
+}
+
+b. The Details (Low level Implementation):
+public class EmailProvider implements MessageSender {
+    public void send(String message) { System.out.println("Email: " + message); }
+}
+
+public class SmsProvider implements MessageSender {
+    public void send(String message) { System.out.println("SMS: " + message); }
+}
+
+c. The High Level Module (Decoupled):
+public class NotificationService {
+    private MessageSender sender;
+
+    // Dependency Injection: We "inject" the tool via the constructor
+    public NotificationService(MessageSender sender) {
+        this.sender = sender;
+    }
+
+    public void notify(String message) {
+        sender.send(message);
+    }
+}
+
